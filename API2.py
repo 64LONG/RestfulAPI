@@ -37,7 +37,7 @@ async def remove_text():
 #curl -X DELETE -v http://127.0.0.1:8000/remove
 
 
-#http://127.0.0.1:8000/get-message?name=Darrion
+#http://127.0.0.1:8000/get-message?name=Toast
 #The url requires the "name" parameter to be pass to allow open properly.
 
 #Reference: https://blog.postman.com/how-to-build-an-api-in-python/
