@@ -126,16 +126,19 @@ def API_Interface():
             #Entry = blog(id=uuid.uuid4(), title=clean_input_title, content=clean_input_content, tags=clean_input_tags)
             print(Entry.text)
         #User input | Reading all blogs within the array
-        if var1 == 2:
-            print("WORK IN PROGRESS | [2] --- Read all blogs within the array")
+        if var1 == "2":
+            print("Reading all blogs currently within the array")
+            blog_stack = requests.get('http://127.0.0.1:8000/blogs')
+            print(blog_stack.text)
         #User input |  Reading a blog by ID within the array
-        if var1 == 3:
+        if var1 == "3":
             print("WORK IN PROGRESS | [3] --- Looking up blog and reading it by id")
+            #NOTE => Grab blog id from JSON item within blog_db array
         #User input |  Updating a blog by ID within the array
-        if var1 == 4:
+        if var1 == "4":
             print("WORK IN PROGRESS | [4] --- Updating blog by id")
         #User input |  Deleting a blog by ID within the array
-        if var1 == 5:
+        if var1 == "5":
             print("WORK IN PROGRESS | [5] --- Deleting blog by id")
     except Exception as e:
         print(f"An error occurred: {e}")
