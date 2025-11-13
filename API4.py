@@ -1,7 +1,7 @@
 #Importing package Web API, FastAPI
 from fastapi import FastAPI, HTTPException
 #Importing pydantic package to classify and manage data
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 #Importing Typing package to note expected data for variables and functions
 from typing import List, Optional
 #Importing UUID package for unique identifers to use
@@ -14,12 +14,20 @@ app= FastAPI()
 #Blog class defintiion with variables
 class Blog(BaseModel):
     id: Optional[UUID] = uuid4()
-    title: str
-    content: str
+    title: str = Field(default_factory="Unknown")
+    content: str = Field(default_factory="Unknown")
     tags: Optional[str] = None
 
+#
+# class BlogCreate(Blog):
+    #pass
+
+#class BlogwithID(Blog):
+    #id: int
+
 #In-memory Storage, an array
-blogs_db = List[Blog]
+#blogs_db = List[Blog]
+blogs_db = []
 
 
 #Option "test" --- Connection test for Sanity Test
@@ -28,10 +36,14 @@ async def read_root():
     return {"Hello": "World"}    
 
 #Option #1 --- Creating blog and adding into array
-@app.post("/blogs", response_model=Blog)
+#@app.post("/blogs", response_model=Blog)
+@app.post("/newblog")
 async def create_blog(blog:Blog):
     blogs_db.append(blog)
-    return blog
+    return{
+        'message':' Blog Created',
+        'blog' : blog
+    } 
 
 #Option #2 --- Read all blogs within the array
 @app.get("/blogs", response_model=List[Blog])
@@ -93,8 +105,16 @@ def API_Interface():
             test = requests.get('http://127.0.0.1:8000/')
             print(test.text)
         #User input | Creating blog and adding into array
-        if var1 == 1:
-            print("WORK IN PROGRESS | [1] --- Creating blog and adding into array")
+        if var1 == "1":
+            print("Welcome to Blog Creatation! Please provide us information for your blog.")
+            input_title=input('Please enter your choice here!')
+            clean_input_title=str(input_title)
+            input_content=input('Please enter your choice here!')
+            clean_input_content=str(input_content)
+            input_tags=input('Please enter your choice here!')
+            clean_input_tags=str(input_tags)
+            Entry = Blog(id=uuid.uuid4(), title=clean_input_title, content=clean_input_content, tags=clean_input_tags)
+            print(Entry)
         #User input | Reading all blogs within the array
         if var1 == 2:
             print("WORK IN PROGRESS | [2] --- Read all blogs within the array")
