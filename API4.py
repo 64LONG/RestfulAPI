@@ -13,7 +13,7 @@ app= FastAPI()
 
 #Blog class defintiion with variables
 class Blog(BaseModel):
-    id: Optional[UUID] = uuid4()
+    blog_id: Optional[UUID] = uuid4()
     title: str = Field(default_factory="Unknown")
     content: str = Field(default_factory="Unknown")
     tags: Optional[str] = None
@@ -107,14 +107,24 @@ def API_Interface():
         #User input | Creating blog and adding into array
         if var1 == "1":
             print("Welcome to Blog Creatation! Please provide us information for your blog.")
-            input_title=input('Please enter your choice here!')
+            input_title=input('Please enter blog title here!        ')
             clean_input_title=str(input_title)
-            input_content=input('Please enter your choice here!')
+            input_content=input('Please enter blog content here!      ')
             clean_input_content=str(input_content)
-            input_tags=input('Please enter your choice here!')
+            input_tags=input('Please enter blog tags here!        ')
             clean_input_tags=str(input_tags)
-            Entry = Blog(id=uuid.uuid4(), title=clean_input_title, content=clean_input_content, tags=clean_input_tags)
-            print(Entry)
+            url='http://127.0.0.1:8000/newblog'
+            blog_unique_id=uuid4()
+            clean_blog_unique_id=str(blog_unique_id)
+            myobj = {
+                'blog_id':clean_blog_unique_id,
+                'title':clean_input_title,
+                'content':clean_input_content,
+                'tags':clean_input_tags
+            }
+            Entry = requests.post(url, json = myobj)
+            #Entry = blog(id=uuid.uuid4(), title=clean_input_title, content=clean_input_content, tags=clean_input_tags)
+            print(Entry.text)
         #User input | Reading all blogs within the array
         if var1 == 2:
             print("WORK IN PROGRESS | [2] --- Read all blogs within the array")
@@ -127,9 +137,9 @@ def API_Interface():
         #User input |  Deleting a blog by ID within the array
         if var1 == 5:
             print("WORK IN PROGRESS | [5] --- Deleting blog by id")
-    except:
-        Print("Failture with API processing")
-
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        print("Failure with API processing")
 
 try:
     API_Interface()
