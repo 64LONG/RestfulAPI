@@ -8,6 +8,8 @@ from typing import List, Optional
 from uuid import uuid4, UUID
 #Importing UUID package for unique identifers to use
 import requests
+#Importing ast package for data type validation
+import ast
 
 app= FastAPI()
 
@@ -128,11 +130,26 @@ def API_Interface():
         #User input | Reading all blogs within the array
         if var1 == "2":
             print("Reading all blogs currently within the array")
-            blog_stack = requests.get('http://127.0.0.1:8000/blogs')
-            print(blog_stack.text)
+            all_blogs = requests.get('http://127.0.0.1:8000/blogs')
+            print(all_blogs.text)
         #User input |  Reading a blog by ID within the array
         if var1 == "3":
-            print("WORK IN PROGRESS | [3] --- Looking up blog and reading it by id")
+            id_number=[]
+            blog_stack=requests.get('http://127.0.0.1:8000/blogs')
+            blog_data=blog_stack.text
+            blog_dict=ast.literal_eval(blog_data)
+            #blog_dict=json.loads(blog_data)
+            #print(blog_data)
+            for blog_list in blog_dict:
+                id_number.append(blog_list["blog_id"])
+            print(id_number)
+                #clean_blog_id_stack=str(blog_id_stack)
+                #print(clean_blog_id_stack)
+            #print(blog_dict["blog_id"])
+            #print(blog_stack.text)
+            #blog_stack = requests.get('http://127.0.0.1:8000/blogs')
+            #print(blog_stack.text)
+            #print("WORK IN PROGRESS | [3] --- Looking up blog and reading it by id")
             #NOTE => Grab blog id from JSON item within blog_db array
         #User input |  Updating a blog by ID within the array
         if var1 == "4":
