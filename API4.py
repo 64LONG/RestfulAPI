@@ -46,29 +46,25 @@ async def read_blogs():
 
 #Option #3 --- Looking up blog and reading it by id
 @app.get("/blogs/{blog_id}", response_model=Blog)
-async def read_blogs(blog_id:UUID):
+async def read_blog(blog_id:UUID):
     for blog in blogs_db:
-        #if blogs_db == blog_id:
-        return blog
-    raise HTTPException(Status_code=404,detail="blog not found")
+        if blog.blog_id == blog_id:
+            return blog
+    raise HTTPException(status_code=404,detail="blog not found")
 #Testing API with HTTP GET via curl command
 #curl -v http://127.0.0.1:8000/get-message?name=Toast
 
 #Option #4 --- Updating blog by id
-@app.get("/blogs/{blog_id}", response_model=Blog)
-async def read_blog(blog_id:UUID):
-        return blogs_db[blog_id]
-        raise HTTPException(Status_code=404,detail="blog not found")
-
 @app.put("/blogs/{blog_id}", response_model=Blog)
-async def update_blogs(blog_id: UUID, blog: Blog):
-    for blog in blogs_db:
-#            if blog["blog_id"] == blog_id:
-                return blog
-    update_item = blog
-    blogs_db[blog_id] = update_item
-    return update_item
-    raise HTTPException(Status_code=404,detail="blog not found")
+async def update_blogs(blog_id: UUID, updated_blog: Blog):
+    for index, blog in enumerate(blogs_db):
+            if blog.blog_id == blog_id:
+                updated_blog.blog_id = blog_id
+                blogs_db[index] = updated_blog
+                return updated_blog
+    raise HTTPException(status_code=404,detail="blog not found")
+
+
 #Testing API with HTTP GET via curl command
 #curl -v http://127.0.0.1:8000/get-message?name=Toast
 
@@ -76,14 +72,16 @@ async def update_blogs(blog_id: UUID, blog: Blog):
 @app.delete("/blogs/{blog_id}", response_model=Blog)
 async def delete_blogs(blog_id: UUID):
     for index, blog in enumerate(blogs_db):
-        #if blog.id == blog_id:
+        if blog.blog_id == blog_id:
             return blogs_db.pop(index)
-    raise HTTPException(Status_code=404,detail="blog not found")
+    raise HTTPException(status_code=404,detail="blog not found")
 #Testing API with HTTP GET via curl command
 #curl -v http://127.0.0.1:8000/get-message?name=Toast
 
+
 #Reference: https://blog.postman.com/how-to-build-an-api-in-python/
 #Reference: https://arjancodes.com/blog/building-rest-apis-with-python-and-fastapi-tutorial/
+
 
 #User Command line tool to use API HTTP methods and definitions
 def API_Interface():
@@ -124,6 +122,7 @@ def API_Interface():
                 'tags':clean_input_tags
             }
             Entry = requests.post(url, json = myobj)
+            #Entry = blog(id=uuid.uuid4(), title=clean_input_title, content=clean_input_content, tags=clean_input_tags)
             print(Entry.text)
         #User input | Reading all blogs within the array
         if var1 == "2":
@@ -173,9 +172,7 @@ def API_Interface():
             print(org.text)
             prep1_org=ast.literal_eval(org.text)
             print(prep1_org)
-            clean_selected_key_value=str(selected_key_value)
-            clean_replacement_value=str(replacement_value)
-            prep1_org.update({clean_selected_key_value:clean_replacement_value})
+            prep1_org.update({selected_key_value:replacement_value})
             url='http://127.0.0.1:8000/blogs/'+uniq
             print(prep1_org)
             editing_res = requests.put(url, json=prep1_org)
