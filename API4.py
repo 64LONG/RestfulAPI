@@ -8,7 +8,7 @@ from typing import List, Optional
 from uuid import uuid4, UUID
 #Importing UUID package for unique identifers to use
 import requests
-#Importing ast package for data type validation
+#Importing ast package for data type and syntax validation
 import ast
 
 app= FastAPI()
@@ -20,18 +20,10 @@ class Blog(BaseModel):
     content: str = Field(default_factory="Unknown")
     tags: Optional[str] = None
 
-#
-# class BlogCreate(Blog):
-    #pass
-
-#class BlogwithID(Blog):
-    #id: int
-
 #In-memory Storage, an array
-#blogs_db = List[Blog]
 blogs_db = []
 
-
+#API HTTP methods and definitions
 #Option "test" --- Connection test for Sanity Test
 @app.get("/")
 async def read_root():
@@ -56,37 +48,44 @@ async def read_blogs():
 @app.get("/blogs/{blog_id}", response_model=Blog)
 async def read_blogs(blog_id:UUID):
     for blog in blogs_db:
-        if blogs_db == blog_id:
-            return blog
+        #if blogs_db == blog_id:
+        return blog
     raise HTTPException(Status_code=404,detail="blog not found")
 #Testing API with HTTP GET via curl command
-#curl -v http://127.0.0.1:8000/get-message?name=Dee
+#curl -v http://127.0.0.1:8000/get-message?name=Toast
 
 #Option #4 --- Updating blog by id
+@app.get("/blogs/{blog_id}", response_model=Blog)
+async def read_blog(blog_id:UUID):
+        return blogs_db[blog_id]
+        raise HTTPException(Status_code=404,detail="blog not found")
+
 @app.put("/blogs/{blog_id}", response_model=Blog)
 async def update_blogs(blog_id: UUID, blog: Blog):
-    for index, stored_blog in enumerate(blogs_db):
-        if stored_blog.id == blog_id:
-            blog_db[index] = blog
-            return blog
+    for blog in blogs_db:
+#            if blog["blog_id"] == blog_id:
+                return blog
+    update_item = blog
+    blogs_db[blog_id] = update_item
+    return update_item
     raise HTTPException(Status_code=404,detail="blog not found")
 #Testing API with HTTP GET via curl command
-#curl -v http://127.0.0.1:8000/get-message?name=Dee
+#curl -v http://127.0.0.1:8000/get-message?name=Toast
 
 #Option #5 --- Deleting blog by id
 @app.delete("/blogs/{blog_id}", response_model=Blog)
 async def delete_blogs(blog_id: UUID):
     for index, blog in enumerate(blogs_db):
-        if blog.id == blog_id:
+        #if blog.id == blog_id:
             return blogs_db.pop(index)
     raise HTTPException(Status_code=404,detail="blog not found")
 #Testing API with HTTP GET via curl command
-#curl -v http://127.0.0.1:8000/get-message?name=Dee
-
+#curl -v http://127.0.0.1:8000/get-message?name=Toast
 
 #Reference: https://blog.postman.com/how-to-build-an-api-in-python/
 #Reference: https://arjancodes.com/blog/building-rest-apis-with-python-and-fastapi-tutorial/
 
+#User Command line tool to use API HTTP methods and definitions
 def API_Interface():
     """API interface for user to interact from executing script"""
     try:
@@ -125,7 +124,6 @@ def API_Interface():
                 'tags':clean_input_tags
             }
             Entry = requests.post(url, json = myobj)
-            #Entry = blog(id=uuid.uuid4(), title=clean_input_title, content=clean_input_content, tags=clean_input_tags)
             print(Entry.text)
         #User input | Reading all blogs within the array
         if var1 == "2":
@@ -134,29 +132,72 @@ def API_Interface():
             print(all_blogs.text)
         #User input |  Reading a blog by ID within the array
         if var1 == "3":
-            id_number=[]
-            blog_stack=requests.get('http://127.0.0.1:8000/blogs')
-            blog_data=blog_stack.text
-            blog_dict=ast.literal_eval(blog_data)
-            #blog_dict=json.loads(blog_data)
-            #print(blog_data)
-            for blog_list in blog_dict:
-                id_number.append(blog_list["blog_id"])
-            print(id_number)
-                #clean_blog_id_stack=str(blog_id_stack)
-                #print(clean_blog_id_stack)
-            #print(blog_dict["blog_id"])
-            #print(blog_stack.text)
-            #blog_stack = requests.get('http://127.0.0.1:8000/blogs')
-            #print(blog_stack.text)
-            #print("WORK IN PROGRESS | [3] --- Looking up blog and reading it by id")
-            #NOTE => Grab blog id from JSON item within blog_db array
-        #User input |  Updating a blog by ID within the array
+            all_blogs = requests.get('http://127.0.0.1:8000/blogs')
+            clean=(all_blogs.text)
+            recon=ast.literal_eval(clean)
+            transposed_data = list(zip(recon))
+            for index,value in enumerate(transposed_data):
+                print(f"Index: {index}, Value: {value}")
+            x=input("Please select a number to pull up a blog: ")
+            clean_x=int(x)
+            print(list(transposed_data[clean_x]))
+            y=list(transposed_data[clean_x])
+            #grabing the list from the array and try the results as a dict
+            z=y[0]
+            uniq=z["blog_id"]
+            test = requests.get('http://127.0.0.1:8000/blogs/'+uniq)
+            print(test.text)
         if var1 == "4":
-            print("WORK IN PROGRESS | [4] --- Updating blog by id")
-        #User input |  Deleting a blog by ID within the array
+            all_blogs = requests.get('http://127.0.0.1:8000/blogs')
+            clean=(all_blogs.text)
+            recon=ast.literal_eval(clean)
+            transposed_data = list(zip(recon))
+            for index,value in enumerate(transposed_data):
+                print(f"Index: {index}, Value: {value}")
+            x=input("Please select a number to pull up a blog: ")
+            clean_x=int(x)
+            print(list(transposed_data[clean_x]))
+            y=list(transposed_data[clean_x])
+            #grabing the list from the array and try the results as a dict
+            z=y[0]
+            uniq=z["blog_id"]
+            key_values=list(z.keys())
+            print(key_values)
+            for index,keys in enumerate(key_values):
+                print(f"Index: {index}, Value: {keys}")
+            x=input("Please select an index number to pull up a key data field to edit: ")
+            clean_x=int(x)
+            selected_key_value=key_values[clean_x]
+            replacement_value=input("Please data to replace values for key pairing: ")
+            org = requests.get('http://127.0.0.1:8000/blogs/'+uniq)
+            print(org.text)
+            prep1_org=ast.literal_eval(org.text)
+            print(prep1_org)
+            clean_selected_key_value=str(selected_key_value)
+            clean_replacement_value=str(replacement_value)
+            prep1_org.update({clean_selected_key_value:clean_replacement_value})
+            url='http://127.0.0.1:8000/blogs/'+uniq
+            print(prep1_org)
+            editing_res = requests.put(url, json=prep1_org)
+            print(editing_res.raw.decode_content)
+            print(editing_res.status_code)
+            print(editing_res.content.decode())
         if var1 == "5":
-            print("WORK IN PROGRESS | [5] --- Deleting blog by id")
+            all_blogs = requests.get('http://127.0.0.1:8000/blogs')
+            clean=(all_blogs.text)
+            recon=ast.literal_eval(clean)
+            transposed_data = list(zip(recon))
+            for index,value in enumerate(transposed_data):
+                print(f"Index: {index}, Value: {value}")
+            x=input("Please select a number to pull up a blog: ")
+            clean_x=int(x)
+            print(list(transposed_data[clean_x]))
+            y=list(transposed_data[clean_x])
+            #grabing the list from the array and try the results as a dict
+            z=y[0]
+            uniq=z["blog_id"]
+            trash = requests.delete('http://127.0.0.1:8000/blogs/'+uniq)
+            print(trash.text)
     except Exception as e:
         print(f"An error occurred: {e}")
         print("Failure with API processing")
