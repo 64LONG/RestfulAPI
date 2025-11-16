@@ -8,10 +8,9 @@ from typing import List, Optional
 from uuid import uuid4, UUID
 #Importing UUID package for unique identifers to use
 import requests
-#Importing ast package for data type and syntax validation
-import ast
 #Importing sqlite package for database integration
 import sqlite3
+#Importing asynccontextmanager package for application startup and tear down directions
 from contextlib import asynccontextmanager
 
 #app= FastAPI()
@@ -51,9 +50,9 @@ app= FastAPI(lifespan=lifespan)
 
 #Blog class defintiion with variables
 class Blog(BaseModel):
-    blog_id: str = uuid4()
-    title: str = Field(default_factory="Unknown")
-    content: str = Field(default_factory="Unknown")
+    #blog_id: str 
+    title: str = Field(default="Unknown")
+    content: str = Field(default="Unknown")
     tags: Optional[str] = None
 
 #API HTTP methods and definitions
@@ -66,7 +65,7 @@ async def read_root():
 #Option #1 --- Creating blog and adding into array
 @app.post("/blogs")
 async def create_blog(blog:Blog):
-    blog_id = blog.blog_id
+    blog_id=str(uuid4())
     
     db= app.state.db
     db.execute(
@@ -189,66 +188,54 @@ def API_Interface():
         if var1 == "3":
             all_blogs = requests.get('http://127.0.0.1:8000/blogs')
             clean=(all_blogs.text)
-            recon=ast.literal_eval(clean)
-            transposed_data = list(zip(recon))
-            for index,value in enumerate(transposed_data):
-                print(f"Index: {index}, Value: {value}")
+            recon=all_blogs.json()
+            for index,blog in enumerate(recon):
+                print(f"Index: {index}, Value: {blog}")
             x=input("Please select a number to pull up a blog: ")
             clean_x=int(x)
-            print(list(transposed_data[clean_x]))
-            y=list(transposed_data[clean_x])
+            y=recon[clean_x]
             #grabing the list from the array and try the results as a dict
-            z=y[0]
-            uniq=z["blog_id"]
+            uniq=y["blog_id"]
             test = requests.get('http://127.0.0.1:8000/blogs/'+uniq)
             print(test.text)
         if var1 == "4":
             all_blogs = requests.get('http://127.0.0.1:8000/blogs')
             clean=(all_blogs.text)
-            recon=ast.literal_eval(clean)
-            transposed_data = list(zip(recon))
-            for index,value in enumerate(transposed_data):
-                print(f"Index: {index}, Value: {value}")
+            recon=all_blogs.json()
+            for index,blog in enumerate(recon):
+                print(f"Index: {index}, Value: {blog}")
             x=input("Please select a number to pull up a blog: ")
             clean_x=int(x)
-            print(list(transposed_data[clean_x]))
-            y=list(transposed_data[clean_x])
+            y=recon[clean_x]
             #grabing the list from the array and try the results as a dict
-            z=y[0]
-            uniq=z["blog_id"]
-            key_values=list(z.keys())
+            uniq=y["blog_id"]
+            key_values=list(y.keys())
             print(key_values)
             for index,keys in enumerate(key_values):
                 print(f"Index: {index}, Value: {keys}")
-            x=input("Please select an index number to pull up a key data field to edit: ")
-            clean_x=int(x)
-            selected_key_value=key_values[clean_x]
+            value_pointer=input("Please select an index number to pull up a key value field to edit: ")
+            clean_value_pointer=int(value_pointer)
+            selected_key_value=key_values[clean_value_pointer]
             replacement_value=input("Please data to replace values for key pairing: ")
             org = requests.get('http://127.0.0.1:8000/blogs/'+uniq)
             print(org.text)
-            prep1_org=ast.literal_eval(org.text)
-            print(prep1_org)
+            prep1_org=org.json()
             prep1_org.update({selected_key_value:replacement_value})
             url='http://127.0.0.1:8000/blogs/'+uniq
             print(prep1_org)
             editing_res = requests.put(url, json=prep1_org)
-#            print(editing_res.raw.decode_content)
-#            print(editing_res.status_code)
-#            print(editing_res.content.decode())
         if var1 == "5":
             all_blogs = requests.get('http://127.0.0.1:8000/blogs')
             clean=(all_blogs.text)
-            recon=ast.literal_eval(clean)
-            transposed_data = list(zip(recon))
-            for index,value in enumerate(transposed_data):
-                print(f"Index: {index}, Value: {value}")
+            recon=all_blogs.json()
+            for index,blog in enumerate(recon):
+                print(f"Index: {index}, Value: {blog}")
             x=input("Please select a number to pull up a blog: ")
             clean_x=int(x)
-            print(list(transposed_data[clean_x]))
-            y=list(transposed_data[clean_x])
+            print(recon[clean_x])
+            y=recon[clean_x]
             #grabing the list from the array and try the results as a dict
-            z=y[0]
-            uniq=z["blog_id"]
+            uniq=y["blog_id"]
             trash = requests.delete('http://127.0.0.1:8000/blogs/'+uniq)
             print(trash.text)
     except Exception as e:
