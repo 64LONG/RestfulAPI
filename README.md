@@ -6,6 +6,10 @@ API Development
 ======================================
 An admin's first journey into backend development using python. 
 
+Utilizing project from roadmap.sh for requirements and direction:
+
+https://roadmap.sh/projects/blogging-platform-api
+
 
 -------------------------------------------
 Prerequisuites
